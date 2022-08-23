@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # noinspection PyUnresolvedReferences
+from pdb import set_trace
 import vtk.vtkInteractionStyle
 # noinspection PyUnresolvedReferences
 import vtk.vtkRenderingOpenGL2
@@ -35,35 +36,12 @@ def main(path, iso):
     if iso_value is None and dicom_dir is not None:
         print('An ISO value is needed.')
         return ()
-
+    set_trace()
     volume = vtkImageData()
-    if dicom_dir is None:
-        # draw a circle
-        sphere_source = vtkSphereSource()
-        sphere_source.SetPhiResolution(20)
-        sphere_source.SetThetaResolution(20)
-        sphere_source.Update()
-
-        bounds = list(sphere_source.GetOutput().GetBounds())
-        for i in range(0, 6, 2):
-            dist = bounds[i + 1] - bounds[i]
-            bounds[i] = bounds[i] - 0.1 * dist
-            bounds[i + 1] = bounds[i + 1] + 0.1 * dist
-        voxel_modeller = vtkVoxelModeller()
-        voxel_modeller.SetSampleDimensions(50, 50, 50)
-        voxel_modeller.SetModelBounds(bounds)
-        voxel_modeller.SetScalarTypeToFloat()
-        voxel_modeller.SetMaximumDistance(0.1)
-
-        voxel_modeller.SetInputConnection(sphere_source.GetOutputPort())
-        voxel_modeller.Update()
-        iso_value = 0.5
-        volume.DeepCopy(voxel_modeller.GetOutput())
-    else:
-        reader = vtkDICOMImageReader()
-        reader.SetDirectoryName(dicom_dir)
-        reader.Update()
-        volume.DeepCopy(reader.GetOutput())
+    reader = vtkDICOMImageReader()
+    reader.SetDirectoryName(dicom_dir)
+    reader.Update() # para aqui
+    volume.DeepCopy(reader.GetOutput())
 
     if use_flying_edges:
         try:
